@@ -4,10 +4,10 @@
   <export target="../../../../Desktop/demo/background/backgroundMap.lua" format="lua"/>
  </editorsettings>
  <tileset firstgid="1" name="art-map" tilewidth="16" tileheight="16" tilecount="234" columns="18">
-  <image source="../../../../Desktop/demo/background/tilemap_packed.png" width="288" height="208"/>
+  <image source="tilemap_packed.png" width="288" height="208"/>
  </tileset>
  <tileset firstgid="235" name="art-mapping" tilewidth="16" tileheight="16" tilecount="234" columns="18">
-  <image source="../../../../Desktop/demo/background/Untitled design-3.png" width="288" height="208"/>
+  <image source="Untitled design-3.png" width="288" height="208"/>
   <tile id="95">
    <properties>
     <property name="bodyOne" type="bool" value="true"/>
