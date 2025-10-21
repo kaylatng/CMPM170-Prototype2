@@ -2,7 +2,26 @@ require "ball"
 
 function love.load()
   sti = require 'libraries/sti'
-  artMap = sti('background/backgroundMap.lua')
+  artMap = sti('background/simple.lua')
+
+  -- load object layer 
+  local objectLayer = artMap.layers["Objects"]
+
+  -- get each location
+  if objectLayer then
+    for _, obj in pairs(objectLayer.objects) do
+      if obj.name == "coin" then
+        local coin =({
+          x= obj.x,
+          y=obj.y,
+          width = obj.width,
+          height = obj.height,
+          gid = obj.gid,
+          collected = false        
+        })
+      end
+    end
+  end
 
   local centerX = love.graphics.getWidth() / 2
   local centerY = love.graphics.getHeight() / 2
@@ -109,7 +128,7 @@ function love.update(dt)
   local isNotRed = math.abs(r - 1) > 0.1 or math.abs(g - 0.2) > 0.1 or math.abs(b - 0.2) > 0.1
 
   if isTouchingRed(ball) and isNotRed then
-    resetGame()
+      resetGame()
   end
   ball:drawTrail(canvas)
 
