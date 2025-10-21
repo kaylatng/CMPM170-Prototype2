@@ -140,7 +140,6 @@ function isTouchingRed(ball)
   return tile and tile.properties and tile.properties.bodyOne
 end
 
-
 function isTouchingYellow(ball)
   local layer = artMap.layers["bodyYELLOW"]
   if not layer or not layer.data then return false end
@@ -152,6 +151,17 @@ function isTouchingYellow(ball)
   return tile and tile.properties and tile.properties.bodyTwo
 end
 
+function isTouchingBlue(ball)
+  local layer = artMap.layers["bodyBLUE"]
+  if not layer or not layer.data then return false end
+
+  local tileX = math.floor(ball.x / artMap.tilewidth)
+  local tileY = math.floor(ball.y / artMap.tileheight)
+
+  local tile = layer.data[tileY] and layer.data[tileY][tileX]
+  return tile and tile.properties and tile.properties.bodyThree
+end
+
 function love.update(dt)
   ball:move(dt)
   ball:collideWall()
@@ -160,12 +170,16 @@ function love.update(dt)
   local r, g, b = ball.rgb.r, ball.rgb.g, ball.rgb.b
   local isNotRed = math.abs(r - 1) > 0.1 or math.abs(g - 0.2) > 0.1 or math.abs(b - 0.2) > 0.1
   local isNotYellow = math.abs(r - 1) > 0.1 or math.abs(g - 1) > 0.1 or math.abs(b - 0.2) > 0.1
+  local isNotBlue = math.abs(r - 0.2) > 0.1 or math.abs(g - 0.6) > 0.1 or math.abs(b - 1.0) > 0.1
 
 
   if (isTouchingRed(ball) and isNotRed) then
       resetGame()
   end
   if isTouchingYellow(ball) and isNotYellow then 
+    resetGame()
+  end
+  if isTouchingBlue(ball) and isNotBlue then
     resetGame()
   end
   ball:drawTrail(canvas)
