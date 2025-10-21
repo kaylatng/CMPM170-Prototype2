@@ -1,6 +1,16 @@
 require "ball"
+require "vector"
+require "reset"
+
+
+GAME_STATE = {
+  IN_PLAY = 0,
+  TRY_AGAIN = 1,
+}
 
 function love.load()
+  love.window.setTitle("prototype 2")
+  love.window.setMode(800, 600)
   sti = require 'libraries/sti'
   artMap = sti('background/simple.lua')
 
@@ -27,6 +37,8 @@ function love.load()
   local centerX = love.graphics.getWidth() / 2
   local centerY = love.graphics.getHeight() / 2
   ball = Ball:new(40, 600, 0, 0, 15)
+  resetPopup = Reset:new(centerX, centerY)
+  state = GAME_STATE.IN_PLAY -- TRY_AGAIN
   
   isDragging = false
   dragStartX = 0
@@ -46,11 +58,13 @@ function love.load()
   
   colorBoxSize = 40
   colorBoxY = love.graphics.getHeight() - 50
+  mousePos = nil
   
   canvas = love.graphics.newCanvas()
   love.graphics.setCanvas(canvas)
   love.graphics.clear(1, 1, 1, 0.4)
   love.graphics.setCanvas()
+  
 end
 
 function love.draw()
@@ -97,6 +111,13 @@ function love.draw()
     end
   end
   
+  if state == GAME_STATE.TRY_AGAIN then
+    love.graphics.setColor(1, 1, 1, 0.4)
+    love.graphics.rectangle("fill", 0, 0, 800, 600)
+    resetPopup:draw()
+    return
+  end
+
   ball:draw()
   
   if isDragging then
@@ -115,6 +136,7 @@ function love.draw()
   
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
+  love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
 end
 
 local colorLayers = {
@@ -163,6 +185,11 @@ function isTouchingBlue(ball)
 end
 
 function love.update(dt)
+
+  mousePos = Vector(
+    love.mouse.getX(),
+    love.mouse.getY()
+  )
   ball:move(dt)
   ball:collideWall()
 
@@ -184,9 +211,20 @@ function love.update(dt)
   end
   ball:drawTrail(canvas)
 
+  if resetPopup:checkForMouseOverYes(mousePos) then
+    resetPopup.state = RESET_STATE.HOVER
+  else
+    resetPopup.state = RESET_STATE.IDLE
+  end
+
 end
 
 function love.mousepressed(x, y, button)
+  if state == GAME_STATE.TRY_AGAIN and resetPopup:checkForMouseOverYes(mousePos) then
+    state = GAME_STATE.IN_PLAY
+    return
+  end
+  
   if button == 1 then
     local platformY = love.graphics.getHeight() - 60
     if y > platformY then
@@ -258,4 +296,6 @@ function resetGame()
   love.graphics.clear(1, 1, 1, 0.4)
 
   love.graphics.setCanvas()
+
+  state = GAME_STATE.TRY_AGAIN
 end
