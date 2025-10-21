@@ -8,20 +8,21 @@ function love.load()
   local objectLayer = artMap.layers["Objects"]
 
   -- get each location
-  if objectLayer then
-    for _, obj in pairs(objectLayer.objects) do
-      if obj.name == "coin" then
-        local coin =({
-          x= obj.x,
-          y=obj.y,
-          width = obj.width,
-          height = obj.height,
-          gid = obj.gid,
-          collected = false        
-        })
-      end
-    end
-  end
+  -- if objectLayer then
+  --   for _, obj in pairs(objectLayer.objects) do
+  --     if obj.name == "yellowbody" then
+  --       local yellowbody ={
+  --         x= obj.x,
+  --         y=obj.y,
+  --         width = obj.width,
+  --         height = obj.height,
+  --         gid = obj.gid,
+  --         collected = false        
+  --       }
+  --       table.insert(yellowbodys, yellowbody)
+  --     end
+  --   end
+  -- end
 
   local centerX = love.graphics.getWidth() / 2
   local centerY = love.graphics.getHeight() / 2
@@ -57,6 +58,13 @@ function love.draw()
   artMap:draw()
   love.graphics.draw(canvas)
 
+  -- draw yellow objects
+  -- for _, yellowbody in ipairs(yellowbodys) do
+  --   if not yellowbody.collected then 
+  --     love.graphics.setColor(1,1,0)
+  --     love.graphics.circle("fill", yellowbody.x + yellowbody.width/2, yellowbody.y + yellowbody.height/2, yellowbody.width/2)
+  --   end
+  -- end
   
   local platformY = love.graphics.getHeight() - 60
   love.graphics.setColor(0.3, 0.3, 0.3, 1)
@@ -109,6 +117,18 @@ function love.draw()
   love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
 end
 
+local colorLayers = {
+  bodyRed = {r = 1.0, g = 0.2, b = 0.2},
+  bodyOrange = {r = 1.0, g = 0.6, b = 0.2},
+  bodyYellow = {r = 1.0, g = 1.0, b = 0.2},
+  bodyGreen = {r = 0.2, g = 1.0, b = 0.2},
+  bodyCyan = {r = 0.2, g = 1.0, b = 1.0},
+  bodyBlue = {r = 0.2, g = 0.6, b = 1.0},
+  bodyPurple = {r = 0.6, g = 0.2, b = 1.0},
+  bodyMagenta = {r = 1.0, g = 0.2, b = 0.8},
+} 
+
+-- add for color detection
 function isTouchingRed(ball)
   local layer = artMap.layers["bodyRED"]
   if not layer or not layer.data then return false end
@@ -120,15 +140,33 @@ function isTouchingRed(ball)
   return tile and tile.properties and tile.properties.bodyOne
 end
 
+
+function isTouchingYellow(ball)
+  local layer = artMap.layers["bodyYELLOW"]
+  if not layer or not layer.data then return false end
+
+  local tileX = math.floor(ball.x / artMap.tilewidth)
+  local tileY = math.floor(ball.y / artMap.tileheight)
+
+  local tile = layer.data[tileY] and layer.data[tileY][tileX]
+  return tile and tile.properties and tile.properties.bodyTwo
+end
+
 function love.update(dt)
   ball:move(dt)
   ball:collideWall()
 
+  -- add for color detection
   local r, g, b = ball.rgb.r, ball.rgb.g, ball.rgb.b
   local isNotRed = math.abs(r - 1) > 0.1 or math.abs(g - 0.2) > 0.1 or math.abs(b - 0.2) > 0.1
+  local isNotYellow = math.abs(r - 1) > 0.1 or math.abs(g - 1) > 0.1 or math.abs(b - 0.2) > 0.1
 
-  if isTouchingRed(ball) and isNotRed then
+
+  if (isTouchingRed(ball) and isNotRed) then
       resetGame()
+  end
+  if isTouchingYellow(ball) and isNotYellow then 
+    resetGame()
   end
   ball:drawTrail(canvas)
 
