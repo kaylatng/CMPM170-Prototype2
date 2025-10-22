@@ -55,6 +55,7 @@ function Ball:collideWall()
     else
       self.x = self.radius
     end
+    
   end
   
   -- PLATFORM/COLOR PICKER

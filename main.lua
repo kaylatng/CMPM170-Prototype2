@@ -7,12 +7,21 @@ GAME_STATE = {
   IN_PLAY = 0,
   TRY_AGAIN = 1,
 }
-
+wrongSound = nil
+bounceSound = nil
 function love.load()
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
   sti = require 'libraries/sti'
   artMap = sti('background/simple.lua')
+  throwSound = love.audio.newSource("sounds/throw.mp3", "static")
+throwSound:setVolume(0.1)
+wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
+wrongSound:setVolume(0.5)
+bounceSound = love.audio.newSource("sounds/bounce.mp3", "static")
+bounceSound:setVolume(0.5)
+switchSound = love.audio.newSource("sounds/switch.mp3", "static")
+switchSound:setVolume(0.5)
 
   -- load object layer 
   local objectLayer = artMap.layers["Objects"]
@@ -64,7 +73,6 @@ function love.load()
   love.graphics.setCanvas(canvas)
   love.graphics.clear(1, 1, 1, 0.4)
   love.graphics.setCanvas()
-  
 end
 
 function love.draw()
@@ -243,6 +251,8 @@ function love.mousepressed(x, y, button)
           ball.rgb.r = color[1]
           ball.rgb.g = color[2]
           ball.rgb.b = color[3]
+          switchSound:stop()
+      switchSound:play()
           return
         end
       end
@@ -267,6 +277,7 @@ function love.mousereleased(x, y, button)
     
     ball.xSpeed = dx
     ball.ySpeed = dy
+    throwSound:play()
   end
 end
 

@@ -122,4 +122,6 @@ function Reset:pickRandomMessage()
     until newMessage ~= lastMessage
     lastMessage = newMessage
     currentMessage = newMessage
+    wrongSound:stop()
+    wrongSound:play()
 end
