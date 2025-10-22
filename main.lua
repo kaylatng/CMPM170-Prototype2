@@ -38,7 +38,7 @@ function love.load()
   local centerY = love.graphics.getHeight() / 2
   ball = Ball:new(40, 600, 0, 0, 15)
   resetPopup = Reset:new(centerX, centerY)
-  state = GAME_STATE.IN_PLAY -- TRY_AGAIN
+  state = GAME_STATE.IN_PLAY
   
   isDragging = false
   dragStartX = 0
@@ -212,7 +212,9 @@ function love.update(dt)
   ball:drawTrail(canvas)
 
   if resetPopup:checkForMouseOverYes(mousePos) then
-    resetPopup.state = RESET_STATE.HOVER
+    resetPopup.state = RESET_STATE.HOVER_YES
+  elseif resetPopup:checkForMouseOverNo(mousePos) then
+    resetPopup.state = RESET_STATE.HOVER_NO
   else
     resetPopup.state = RESET_STATE.IDLE
   end
@@ -222,6 +224,9 @@ end
 function love.mousepressed(x, y, button)
   if state == GAME_STATE.TRY_AGAIN and resetPopup:checkForMouseOverYes(mousePos) then
     state = GAME_STATE.IN_PLAY
+    return
+  elseif state == GAME_STATE.TRY_AGAIN and resetPopup:checkForMouseOverNo(mousePos) then
+    resetPopup:pickRandomMessage()
     return
   end
   

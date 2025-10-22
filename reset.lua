@@ -4,9 +4,39 @@ Reset = {}
 
 RESET_STATE = {
   IDLE = 0,
-  HOVER = 1,
-  PRESSED = 2,
+  HOVER_YES = 1,
+  HOVER_NO = 2,
+  PRESSED_YES = 3,
+  PRESSED_NO = 4,
 }
+
+local messages = {
+    "you're kinda bad at this...",
+    "wow, that was... something.",
+    "did you even try?",
+    "maybe gaming just isn’t your thing.",
+    "yikes.",
+    "skill issue.",
+    "embarrassing.",
+    "bro, seriously?",
+    "i’ve seen NPCs do better.",
+    "you call that an attempt?",
+    "my grandma could beat this level.",
+    "not your proudest moment, huh?",
+    "you sure you’re playing with the screen on?",
+    "it’s okay, failure builds character. supposedly.",
+    "if failing was the goal, you’re crushing it.",
+    "you missed. again.",
+    "pro tip: don’t do that.",
+    "pain. just pain.",
+    "that was a bold strategy. it didn’t work.",
+    "speedrun to failure complete!",
+    "that was so bad, the code cried.",
+    "i had to think of typing this failure screen message btw.",
+    "good thing winning this game isn't part of your grade!",
+    "...",
+}
+local currentMessage = ""
 
 local resetImage = nil
 
@@ -19,8 +49,8 @@ function Reset:new(xPos, yPos)
   reset.size = Vector(388, 325)
   reset.state = RESET_STATE.IDLE
 
-  reset.positionYES = Vector(xPos - 120, yPos + 40)
-  reset.positionNO = Vector(xPos + 30, yPos + 40)
+  reset.positionYES = Vector(xPos - 120, yPos + 25)
+  reset.positionNO = Vector(xPos + 30, yPos + 25)
 
   return reset
 end
@@ -44,19 +74,25 @@ function Reset:draw()
 
   self:loadImage()
   quad = love.graphics.newQuad(0, 0, self.size.x, self.size.y, resetImage:getWidth(), resetImage:getHeight())
-  love.graphics.draw(resetImage, quad, self.position.x/2, self.position.y/2 - 30)
+  love.graphics.draw(resetImage, quad, self.position.x/2, self.position.y/2 - 50)
 
-  if(self.state == RESET_STATE.HOVER) then
+  if(self.state == RESET_STATE.HOVER_YES) then
     love.graphics.setColor(1, 0.2, 0.2, 1)
   else
     love.graphics.setColor(0, 0, 0, 1)
   end
   love.graphics.print("YES", self.positionYES.x, self.positionYES.y)
 
-  love.graphics.setColor(0, 0, 0, 1)
+  if(self.state == RESET_STATE.HOVER_NO) then
+    love.graphics.setColor(1, 0.2, 0.2, 1)
+  else
+    love.graphics.setColor(0, 0, 0, 1)
+  end
   love.graphics.print("NO", self.positionNO.x, self.positionNO.y)
-
   love.graphics.setFont(normalFont)
+  love.graphics.setColor(0, 0, 0, 1)
+  local width = 300  -- arbitrary area width to center within
+  love.graphics.printf(currentMessage, self.position.x - width / 2, self.position.y + 150, width, "center")
 end
 
 function Reset:checkForMouseOverYes(mousePos)
@@ -75,4 +111,15 @@ end
 
 function Reset:mousePressed()
   return true
+end
+
+local lastMessage
+
+function Reset:pickRandomMessage()
+    local newMessage
+    repeat
+        newMessage = messages[love.math.random(#messages)]
+    until newMessage ~= lastMessage
+    lastMessage = newMessage
+    currentMessage = newMessage
 end
