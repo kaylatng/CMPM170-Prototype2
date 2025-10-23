@@ -402,6 +402,12 @@ function love.keypressed(key)
     ball.ySpeed = 0
     ball.trail = {}
   end
+  local objectLayer = artMap.layers["Objects"]
+  if objectLayer then 
+    for _, obj in ipairs(artMap.layers["Objects"].objects) do
+      obj.visible = true
+    end
+  end
 end
 
 function resetGame()
