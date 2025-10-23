@@ -8,14 +8,14 @@ GAME_STATE = {
   IN_PLAY = 0,
   TRY_AGAIN = 1,
   SETTINGS = 2,
-  WON = 3
+  WON = 3,
+  JOY = 4,
 }
 
 wrongSound = nil
 bounceSound = nil
 twinkleSound = nil
 sadhorn = nil
-
 
 function love.load()
   love.window.setTitle("prototype 2")
@@ -315,6 +315,8 @@ function love.update(dt)
     settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_HARD
   elseif settingButton:checkForMouseOverExit(mousePos) then 
     settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_EXIT
+  elseif settingButton:checkForMouseOverJoy(mousePos) then 
+    settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_JOY
   else
     settingButton.screen_state = SETTING_SCREEN_STATE.IDLE
   end
@@ -365,6 +367,7 @@ function love.mousepressed(x, y, button)
   if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverEasy(mousePos) then
     state = GAME_STATE.IN_PLAY
     settingButton.state = SETTING_STATE.IDLE
+    ball.state = BALL_STATE.MAIN
     artMap = sti('background/easy.lua')
     switchSound:stop()
     switchSound:play()
@@ -373,6 +376,16 @@ function love.mousepressed(x, y, button)
   if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverHard(mousePos) then
     state = GAME_STATE.IN_PLAY
     settingButton.state = SETTING_STATE.IDLE
+    ball.state = BALL_STATE.MAIN
+    artMap = sti('background/simple.lua')
+    switchSound:stop()
+    switchSound:play()
+  end
+
+  if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverJoy(mousePos) then
+    state = GAME_STATE.IN_PLAY
+    settingButton.state = SETTING_STATE.IDLE
+    ball.state = BALL_STATE.JOY
     artMap = sti('background/simple.lua')
     switchSound:stop()
     switchSound:play()

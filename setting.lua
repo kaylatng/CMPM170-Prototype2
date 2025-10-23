@@ -13,11 +13,13 @@ SETTING_SCREEN_STATE = {
   HOVER_EASY = 1,
   HOVER_HARD = 2,
   HOVER_EXIT = 3,
+  HOVER_JOY = 4,
 }
 
-local positionEASY = Vector(340, 260) 
-local positionHARD = Vector(330, 320)
+local positionEASY = Vector(340, 250) 
+local positionHARD = Vector(330, 305)
 local positionEXIT = Vector(500, 133)
+local positionJOY = Vector(385, 365)
 
 local settingImage = nil
 local settingScreen = nil
@@ -55,7 +57,6 @@ end
 
 function Setting:draw()
   if self.state == SETTING_STATE.SETTINGS then 
-
     screen = self:loadScreen()
     quadScreen = love.graphics.newQuad(0, 0, 281, 314, screen:getDimensions())
     love.graphics.setColor(1, 1, 1, 1)
@@ -87,6 +88,13 @@ function Setting:draw()
       love.graphics.setColor(0, 0, 0, 1)
     end
     love.graphics.print("×", positionEXIT.x, positionEXIT.y)
+
+    if(self.screen_state == SETTING_SCREEN_STATE.HOVER_JOY) then
+      love.graphics.setColor(1, 0.2, 0.2, 1)
+    else
+      love.graphics.setColor(0, 0, 0, 1)
+    end
+    love.graphics.print("JOY", positionJOY.x, positionJOY.y)
 
     love.graphics.setFont(normalFont)
   else
@@ -136,6 +144,13 @@ function Setting:checkForMouseOverExit(mousePos)
         mousePos.x < positionEXIT.x + 135 and
         mousePos.y > positionEXIT.y and
         mousePos.y < positionEXIT.y + 50
+end
+
+function Setting:checkForMouseOverJoy(mousePos)
+  return mousePos.x > positionJOY.x and
+        mousePos.x < positionJOY.x + 40 and
+        mousePos.y > positionJOY.y and
+        mousePos.y < positionJOY.y + 20
 end
 
 function Setting:mousePressed()

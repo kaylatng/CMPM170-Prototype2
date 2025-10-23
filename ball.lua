@@ -1,6 +1,11 @@
 Ball = {}
 Ball.__index = Ball
 
+BALL_STATE = {
+  MAIN = 0,
+  JOY = 1,
+}
+
 function Ball:new(x, y, xSpeed, ySpeed, radius)
   local ball = {
     x = x,
@@ -13,11 +18,27 @@ function Ball:new(x, y, xSpeed, ySpeed, radius)
       g = 0.2,
       b = 0.2,
     },
-    trail = {}
+    trail = {},
+    state = BALL_STATE.MAIN,
+    colorTimer = 0,
   }
   
   setmetatable(ball, self)
   return ball
+end
+
+function Ball:updateColor(dt)
+  if self.state == BALL_STATE.JOY then
+    self.colorTimer = self.colorTimer + dt
+
+    -- Every 0.5s, switch to a random pastel color
+    if self.colorTimer > 0.5 then
+      self.rgb.r = 0.5 + love.math.random() * 0.5
+      self.rgb.g = 0.5 + love.math.random() * 0.5
+      self.rgb.b = 0.5 + love.math.random() * 0.5
+      self.colorTimer = 0
+    end
+  end
 end
 
 function Ball:draw()
@@ -35,6 +56,8 @@ function Ball:move(dt)
   if #self.trail > 50 then
     table.remove(self.trail, 1)
   end
+
+  self:updateColor(dt)
   
   -- GRAVITY
   self.ySpeed = self.ySpeed + (800 * dt)
