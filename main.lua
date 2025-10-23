@@ -2,6 +2,7 @@ require "ball"
 require "vector"
 require "reset"
 require "setting"
+require "win"
 
 GAME_STATE = {
   IN_PLAY = 0,
@@ -12,6 +13,10 @@ GAME_STATE = {
 
 wrongSound = nil
 bounceSound = nil
+twinkleSound = nil
+sadhorn = nil
+
+
 function love.load()
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
@@ -25,6 +30,10 @@ function love.load()
   bounceSound:setVolume(0.5)
   switchSound = love.audio.newSource("sounds/switch.mp3", "static")
   switchSound:setVolume(0.5)
+  twinkleSound = love.audio.newSource("sounds/twinkle.mp3", "static")
+  twinkleSound:setVolume(0.5)
+  sadhorn = love.audio.newSource("sounds/sad_horn.wav", "static")
+  sadhorn:setVolume(0.5)
 
   targetZones = {}
   -- load object layer 
@@ -51,6 +60,7 @@ function love.load()
   ball = Ball:new(40, 600, 0, 0, 15)
   resetPopup = Reset:new(centerX, centerY)
   settingButton = Setting:new(love.graphics.getWidth() - 60 + 10, love.graphics.getHeight() - 60 + 10)
+  winPopup = Win:new(centerX, centerY)
   state = GAME_STATE.IN_PLAY
   
   isDragging = false
@@ -150,9 +160,9 @@ function love.draw()
   end
 
   if state == GAME_STATE.WON then
-     love.graphics.setColor(1, 1, 1, 0.4)
+    love.graphics.setColor(1, 1, 1, 0.4)
     love.graphics.rectangle("fill", 0, 0, 800, 600)
-    resetPopup:draw()
+    winPopup:draw()
     return
   end
 
@@ -291,6 +301,14 @@ function love.update(dt)
     resetPopup.state = RESET_STATE.IDLE
   end
 
+  if winPopup:checkForMouseOverRetry(mousePos) then
+    winPopup.state = WIN_STATE.HOVER_RETRY
+  elseif winPopup:checkForMouseOverExit(mousePos) then
+    winPopup.state = WIN_STATE.HOVER_EXIT
+  else
+    winPopup.state = WIN_STATE.IDLE
+  end
+
   if settingButton:checkForMouseOverEasy(mousePos) then
     settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_EASY
   elseif settingButton:checkForMouseOverHard(mousePos) then
@@ -315,6 +333,18 @@ function love.mousepressed(x, y, button)
     return
   elseif state == GAME_STATE.TRY_AGAIN and resetPopup:checkForMouseOverNo(mousePos) then
     resetPopup:pickRandomMessage()
+    return
+  end
+
+  if state == GAME_STATE.WON and winPopup:checkForMouseOverRetry(mousePos) then
+    switchSound:stop()
+    switchSound:play()
+    resetGameWin()
+    return
+  elseif state == GAME_STATE.WON and winPopup:checkForMouseOverExit(mousePos) then
+    switchSound:stop()
+    switchSound:play()
+    love.event.quit()
     return
   end
 
@@ -343,7 +373,7 @@ function love.mousepressed(x, y, button)
   if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverHard(mousePos) then
     state = GAME_STATE.IN_PLAY
     settingButton.state = SETTING_STATE.IDLE
-    artMap = sti('background/backgroundMap.lua')
+    artMap = sti('background/simple.lua')
     switchSound:stop()
     switchSound:play()
   end
@@ -437,10 +467,44 @@ function resetGame()
   end
 
   state = GAME_STATE.TRY_AGAIN
+  sadhorn:stop()
+  sadhorn:play()
   resetPopup:pickFirstRandomMessage()
 end
 
-
 function gamewon()
-  state = GAME_STATE.WON
+  if state ~= GAME_STATE.WON then
+    state = GAME_STATE.WON
+    twinkleSound:stop()
+    twinkleSound:play()
+  end
+end
+
+function resetGameWin()
+  state = GAME_STATE.IN_PLAY
+  
+  ball.x = 40
+  ball.y = 600
+  ball.xSpeed = 0
+  ball.ySpeed = 0
+  ball.rgb.r = 1
+  ball.rgb.g = 0.2
+  ball.rgb.b = 0.2
+
+  ball.xSpeed = 0
+  ball.ySpeed = 0
+  ball.trail = {}
+
+
+  love.graphics.setCanvas(canvas)
+  love.graphics.clear(1, 1, 1, 0.4)
+
+  love.graphics.setCanvas()
+
+  local objectLayer = artMap.layers["Objects"]
+  if objectLayer then 
+    for _, obj in ipairs(artMap.layers["Objects"].objects) do
+      obj.visible = true
+    end
+  end
 end
