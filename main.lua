@@ -286,7 +286,7 @@ function love.update(dt)
   end
 
   -- Check if all objects are now invisible
-  if (counterTrue == 0) then
+  if (counterTrue == 0 and ball.state == BALL_STATE.MAIN) then
     gamewon()
   end
   
@@ -386,7 +386,7 @@ function love.mousepressed(x, y, button)
     state = GAME_STATE.IN_PLAY
     settingButton.state = SETTING_STATE.IDLE
     ball.state = BALL_STATE.JOY
-    artMap = sti('background/simple.lua')
+    artMap = sti('background/whitebackground.lua')
     switchSound:stop()
     switchSound:play()
   end
