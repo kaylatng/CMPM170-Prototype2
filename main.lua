@@ -1,12 +1,14 @@
 require "ball"
 require "vector"
 require "reset"
-
+require "setting"
 
 GAME_STATE = {
   IN_PLAY = 0,
   TRY_AGAIN = 1,
+  SETTINGS = 2,
 }
+
 wrongSound = nil
 bounceSound = nil
 function love.load()
@@ -15,13 +17,13 @@ function love.load()
   sti = require 'libraries/sti'
   artMap = sti('background/simple.lua')
   throwSound = love.audio.newSource("sounds/throw.mp3", "static")
-throwSound:setVolume(0.1)
-wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
-wrongSound:setVolume(0.5)
-bounceSound = love.audio.newSource("sounds/bounce.mp3", "static")
-bounceSound:setVolume(0.5)
-switchSound = love.audio.newSource("sounds/switch.mp3", "static")
-switchSound:setVolume(0.5)
+  throwSound:setVolume(0.1)
+  wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
+  wrongSound:setVolume(0.5)
+  bounceSound = love.audio.newSource("sounds/bounce.mp3", "static")
+  bounceSound:setVolume(0.5)
+  switchSound = love.audio.newSource("sounds/switch.mp3", "static")
+  switchSound:setVolume(0.5)
 
   -- load object layer 
   local objectLayer = artMap.layers["Objects"]
@@ -47,7 +49,8 @@ switchSound:setVolume(0.5)
   local centerY = love.graphics.getHeight() / 2
   ball = Ball:new(40, 600, 0, 0, 15)
   resetPopup = Reset:new(centerX, centerY)
-  state = GAME_STATE.IN_PLAY
+  settingButton = Setting:new(love.graphics.getWidth() - 60 + 10, love.graphics.getHeight() - 60 + 10)
+  state = GAME_STATE.SETTINGS -- IN_PLAY
   
   isDragging = false
   dragStartX = 0
@@ -126,7 +129,16 @@ function love.draw()
     return
   end
 
+  if state == GAME_STATE.SETTINGS then
+    love.graphics.setColor(1, 1, 1, 0.4)
+    love.graphics.rectangle("fill", 0, 0, 800, 600)
+    settingButton.state = SETTING_STATE.SETTINGS
+    settingButton:draw()
+    return
+  end
+
   ball:draw()
+  settingButton:draw()
   
   if isDragging then
     local mx, my = love.mouse.getPosition()
@@ -227,6 +239,12 @@ function love.update(dt)
     resetPopup.state = RESET_STATE.IDLE
   end
 
+  if state == GAME_STATE.IN_PLAY and settingButton:checkForMouseOver(mousePos) then
+    settingButton.state = SETTING_STATE.HOVER
+  else
+    settingButton.state = SETTING_STATE.IDLE
+  end
+
 end
 
 function love.mousepressed(x, y, button)
@@ -236,6 +254,13 @@ function love.mousepressed(x, y, button)
   elseif state == GAME_STATE.TRY_AGAIN and resetPopup:checkForMouseOverNo(mousePos) then
     resetPopup:pickRandomMessage()
     return
+  end
+
+  if state == GAME_STATE.IN_PLAY and settingButton:checkForMouseOver(mousePos) then
+    state = GAME_STATE.SETTINGS
+    settingButton.state = SETTING_STATE.SETTINGS
+    switchSound:stop()
+    switchSound:play()
   end
   
   if button == 1 then
@@ -314,4 +339,5 @@ function resetGame()
   love.graphics.setCanvas()
 
   state = GAME_STATE.TRY_AGAIN
+  resetPopup:pickFirstRandomMessage()
 end

@@ -35,6 +35,24 @@ local messages = {
     "i had to think of typing this failure screen message btw.",
     "good thing winning this game isn't part of your grade!",
     "...",
+    "congrats! you’ve unlocked: disappointment.",
+    "at least you’re consistent. consistently bad.",
+    "new record! for shortest survival time.",
+    "that move was so bad it should be illegal.",
+    "you’re making the reset screen tired.",
+    "we didn’t balance the game for this level of failure.",
+    "i’m starting to think you’re doing it on purpose.",
+    "the controls are fine, your skills maybe not so much...",
+    "that was... impressively bad.",
+    "the restart button must be your best friend by now.",
+    "plot twist: the real enemy was you all along.",
+    "you've achieved a new low. congrats?",
+    "somewhere, a speedrunner just cried.",
+    "at least you make failure look entertaining.",
+    "hint: launch the ink ball towards the stencil!",
+    "chat is this normal?",
+    "chat are you seeing this?",
+    "lol you're not allowed to say no.",
 }
 local currentMessage = ""
 
@@ -124,4 +142,13 @@ function Reset:pickRandomMessage()
     currentMessage = newMessage
     wrongSound:stop()
     wrongSound:play()
+end
+
+function Reset:pickFirstRandomMessage()
+    local newMessage
+    repeat
+        newMessage = messages[love.math.random(#messages)]
+    until newMessage ~= lastMessage
+    lastMessage = newMessage
+    currentMessage = newMessage
 end
