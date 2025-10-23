@@ -16,7 +16,7 @@ function love.load()
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
   sti = require 'libraries/sti'
-  artMap = sti('background/easy.lua')
+  artMap = sti('background/simple.lua')
   throwSound = love.audio.newSource("sounds/throw.mp3", "static")
   throwSound:setVolume(0.1)
   wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
@@ -87,25 +87,17 @@ function love.draw()
   -- draw objects
   local objectLayer = artMap.layers["Objects"]
   
-  local y = 10  -- starting Y position
-  local lineHeight = 20  -- space between lines
   counterTrue = 0
   if objectLayer then 
     for _, zone in ipairs(objectLayer.objects) do
       if zone.visible then
         counterTrue = counterTrue + 1
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.print("\nnot done yet", 10, 10)
-      if (counterTrue < 9) then 
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.print("Hiding object ID: " .. zone.id, 10, y)
-        y = y + lineHeight      end
       end
     end
   end
 
   love.graphics.setColor(1, 0, 0)
-  love.graphics.print("\n\n\n\nVisible zones: " .. counterTrue, 10, 10)
+  love.graphics.print("\nVisible zones: " .. counterTrue, 10, 10)
 
   local platformY = love.graphics.getHeight() - 60
   love.graphics.setColor(0.3, 0.3, 0.3, 1)
@@ -154,6 +146,13 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, 800, 600)
     settingButton.state = SETTING_STATE.SETTINGS
     settingButton:draw()
+    return
+  end
+
+  if state == GAME_STATE.WON then
+     love.graphics.setColor(1, 1, 1, 0.4)
+    love.graphics.rectangle("fill", 0, 0, 800, 600)
+    resetPopup:draw()
     return
   end
 
@@ -220,26 +219,6 @@ function isTouchingBlue(ball)
   return tile and tile.properties and tile.properties.bodyThree
 end
 
-function extractVisibleObjects()
-  local objectLayer = artMap.layers["Objects"]
-  local extractedObjects = {}
-  -- counterTrue = 0
-
-  for _, obj in ipairs(objectLayer.objects) do
-    table.insert(extractedObjects, {
-      id = obj.id,
-      x = obj.x,
-      y = obj.y,
-      visible = obj.visible
-    })
-
-    if obj.visible then
-      -- counterTrue = counterTrue + 1
-    end
-  end
-end
-
-
 function love.update(dt)
 
   mousePos = Vector(
@@ -258,29 +237,13 @@ function love.update(dt)
   local isNotYellow = math.abs(r - 1) > 0.1 or math.abs(g - 1) > 0.1 or math.abs(b - 0.2) > 0.1
   local isNotBlue = math.abs(r - 0.2) > 0.1 or math.abs(g - 0.6) > 0.1 or math.abs(b - 1.0) > 0.1
 
-
-  -- if (isTouchingRed(ball) and isNotRed) then
-  --     resetGame()
-  -- end
-  -- if isTouchingYellow(ball) and isNotYellow then 
-  --   resetGame()
-  -- end
-  -- if isTouchingBlue(ball) and isNotBlue then
-  --   resetGame()
-  -- end
   function isNear(x1, y1, x2, y2, radius)
     return math.abs(x1 - x2) < radius and math.abs(y1 - y2) < radius
   end
 
   if isTouchingRed(ball) then
     if not isNotRed then
-      if objectLayer then
-        for _, obj in ipairs(artMap.layers["Objects"].objects) do
-          if obj.visible and isNear(ball.x, ball.y, obj.x, obj.y, 16) then
-            obj.visible = false
-          end
-        end
-      end
+      -- nothing here for now - sound maybe? 
     elseif isNotRed then
       resetGame()
     end
@@ -288,7 +251,7 @@ function love.update(dt)
 
   if isTouchingYellow(ball) then
     if not isNotYellow then 
-      -- counter & make object visible false
+      -- nothing here for now -  sound maybe? 
     elseif isNotYellow then
       resetGame()
     end
@@ -296,11 +259,27 @@ function love.update(dt)
 
   if isTouchingBlue(ball) then 
     if not isNotBlue then
-      -- counter 
+      -- nothing here for now -  sound maybe? 
     elseif isNotBlue then
       resetGame()
     end
   end
+
+  -- Objects stuff --
+  -- /check if ball is near object 
+  if objectLayer then 
+    for _, obj in ipairs(artMap.layers["Objects"].objects) do
+      if obj.visible and isNear(ball.x, ball.y, obj.x, obj.y, 16) then
+        obj.visible = false
+      end
+    end
+  end
+
+  -- Check if all objects are now invisible
+  if (counterTrue == 0) then
+    gamewon()
+  end
+  
 
   ball:drawTrail(canvas)
 
@@ -444,6 +423,18 @@ function resetGame()
 
   love.graphics.setCanvas()
 
+  local objectLayer = artMap.layers["Objects"]
+  if objectLayer then 
+    for _, obj in ipairs(artMap.layers["Objects"].objects) do
+      obj.visible = true
+    end
+  end
+
   state = GAME_STATE.TRY_AGAIN
   resetPopup:pickFirstRandomMessage()
+end
+
+
+function gamewon()
+  state = GAME_STATE.WON
 end
