@@ -243,7 +243,7 @@ function love.update(dt)
 
   if isTouchingRed(ball) then
     if not isNotRed then
-      -- nothing here for now - sound maybe? 
+      -- sound maybe?  -- in here is when the ball is in the correct color space -
     elseif isNotRed then
       resetGame()
     end
