@@ -31,16 +31,18 @@ function love.load()
   local objectLayer = artMap.layers["Objects"]
 
   -- get each location
-  for _, obj in pairs(objectLayer.objects) do
-    if obj.name == "block" then
-      table.insert(targetZones, {
-        x = obj.x,
-        y = obj.y,
-        width = obj.width,
-        height = obj.height,
-        covered = false,
-        visible = obj.visible
-      })
+  if objectLayer then 
+    for _, obj in pairs(objectLayer.objects) do
+      if obj.name == "block" then
+        table.insert(targetZones, {
+          x = obj.x,
+          y = obj.y,
+          width = obj.width,
+          height = obj.height,
+          covered = false,
+          visible = obj.visible
+        })
+      end
     end
   end
 
@@ -88,15 +90,17 @@ function love.draw()
   local y = 10  -- starting Y position
   local lineHeight = 20  -- space between lines
   counterTrue = 0
-  for _, zone in ipairs(objectLayer.objects) do
-    if zone.visible then
-      counterTrue = counterTrue + 1
-      love.graphics.setColor(1, 0, 0)
-      love.graphics.print("\nnot done yet", 10, 10)
-    if (counterTrue < 9) then 
-      love.graphics.setColor(1, 0, 0)
-      love.graphics.print("Hiding object ID: " .. zone.id, 10, y)
-      y = y + lineHeight      end
+  if objectLayer then 
+    for _, zone in ipairs(objectLayer.objects) do
+      if zone.visible then
+        counterTrue = counterTrue + 1
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.print("\nnot done yet", 10, 10)
+      if (counterTrue < 9) then 
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.print("Hiding object ID: " .. zone.id, 10, y)
+        y = y + lineHeight      end
+      end
     end
   end
 
@@ -270,9 +274,11 @@ function love.update(dt)
 
   if isTouchingRed(ball) then
     if not isNotRed then
-      for _, obj in ipairs(artMap.layers["Objects"].objects) do
-        if obj.visible and isNear(ball.x, ball.y, obj.x, obj.y, 16) then
-          obj.visible = false
+      if objectLayer then
+        for _, obj in ipairs(artMap.layers["Objects"].objects) do
+          if obj.visible and isNear(ball.x, ball.y, obj.x, obj.y, 16) then
+            obj.visible = false
+          end
         end
       end
     elseif isNotRed then
