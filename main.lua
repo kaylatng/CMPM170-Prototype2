@@ -7,6 +7,7 @@ GAME_STATE = {
   IN_PLAY = 0,
   TRY_AGAIN = 1,
   SETTINGS = 2,
+  WON = 3
 }
 
 wrongSound = nil
@@ -15,7 +16,7 @@ function love.load()
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
   sti = require 'libraries/sti'
-  artMap = sti('background/simple.lua')
+  artMap = sti('background/easy.lua')
   throwSound = love.audio.newSource("sounds/throw.mp3", "static")
   throwSound:setVolume(0.1)
   wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
@@ -25,25 +26,23 @@ function love.load()
   switchSound = love.audio.newSource("sounds/switch.mp3", "static")
   switchSound:setVolume(0.5)
 
+  targetZones = {}
   -- load object layer 
   local objectLayer = artMap.layers["Objects"]
 
   -- get each location
-  -- if objectLayer then
-  --   for _, obj in pairs(objectLayer.objects) do
-  --     if obj.name == "yellowbody" then
-  --       local yellowbody ={
-  --         x= obj.x,
-  --         y=obj.y,
-  --         width = obj.width,
-  --         height = obj.height,
-  --         gid = obj.gid,
-  --         collected = false        
-  --       }
-  --       table.insert(yellowbodys, yellowbody)
-  --     end
-  --   end
-  -- end
+  for _, obj in pairs(objectLayer.objects) do
+    if obj.name == "block" then
+      table.insert(targetZones, {
+        x = obj.x,
+        y = obj.y,
+        width = obj.width,
+        height = obj.height,
+        covered = false,
+        visible = obj.visible
+      })
+    end
+  end
 
   local centerX = love.graphics.getWidth() / 2
   local centerY = love.graphics.getHeight() / 2
@@ -83,14 +82,27 @@ function love.draw()
   artMap:draw()
   love.graphics.draw(canvas)
 
-  -- draw yellow objects
-  -- for _, yellowbody in ipairs(yellowbodys) do
-  --   if not yellowbody.collected then 
-  --     love.graphics.setColor(1,1,0)
-  --     love.graphics.circle("fill", yellowbody.x + yellowbody.width/2, yellowbody.y + yellowbody.height/2, yellowbody.width/2)
-  --   end
-  -- end
+  -- draw objects
+  local objectLayer = artMap.layers["Objects"]
   
+  local y = 10  -- starting Y position
+  local lineHeight = 20  -- space between lines
+  counterTrue = 0
+  for _, zone in ipairs(objectLayer.objects) do
+    if zone.visible then
+      counterTrue = counterTrue + 1
+      love.graphics.setColor(1, 0, 0)
+      love.graphics.print("\nnot done yet", 10, 10)
+    if (counterTrue < 9) then 
+      love.graphics.setColor(1, 0, 0)
+      love.graphics.print("Hiding object ID: " .. zone.id, 10, y)
+      y = y + lineHeight      end
+    end
+  end
+
+  love.graphics.setColor(1, 0, 0)
+  love.graphics.print("\n\n\n\nVisible zones: " .. counterTrue, 10, 10)
+
   local platformY = love.graphics.getHeight() - 60
   love.graphics.setColor(0.3, 0.3, 0.3, 1)
   love.graphics.rectangle("fill", 0, platformY, love.graphics.getWidth(), 3)
@@ -204,12 +216,35 @@ function isTouchingBlue(ball)
   return tile and tile.properties and tile.properties.bodyThree
 end
 
+function extractVisibleObjects()
+  local objectLayer = artMap.layers["Objects"]
+  local extractedObjects = {}
+  -- counterTrue = 0
+
+  for _, obj in ipairs(objectLayer.objects) do
+    table.insert(extractedObjects, {
+      id = obj.id,
+      x = obj.x,
+      y = obj.y,
+      visible = obj.visible
+    })
+
+    if obj.visible then
+      -- counterTrue = counterTrue + 1
+    end
+  end
+end
+
+
 function love.update(dt)
 
   mousePos = Vector(
     love.mouse.getX(),
     love.mouse.getY()
   )
+
+  local objectLayer = artMap.layers["Objects"]
+
   ball:move(dt)
   ball:collideWall()
 
@@ -220,15 +255,47 @@ function love.update(dt)
   local isNotBlue = math.abs(r - 0.2) > 0.1 or math.abs(g - 0.6) > 0.1 or math.abs(b - 1.0) > 0.1
 
 
-  if (isTouchingRed(ball) and isNotRed) then
+  -- if (isTouchingRed(ball) and isNotRed) then
+  --     resetGame()
+  -- end
+  -- if isTouchingYellow(ball) and isNotYellow then 
+  --   resetGame()
+  -- end
+  -- if isTouchingBlue(ball) and isNotBlue then
+  --   resetGame()
+  -- end
+  function isNear(x1, y1, x2, y2, radius)
+    return math.abs(x1 - x2) < radius and math.abs(y1 - y2) < radius
+  end
+
+  if isTouchingRed(ball) then
+    if not isNotRed then
+      for _, obj in ipairs(artMap.layers["Objects"].objects) do
+        if obj.visible and isNear(ball.x, ball.y, obj.x, obj.y, 16) then
+          obj.visible = false
+        end
+      end
+    elseif isNotRed then
       resetGame()
+    end
   end
-  if isTouchingYellow(ball) and isNotYellow then 
-    resetGame()
+
+  if isTouchingYellow(ball) then
+    if not isNotYellow then 
+      -- counter & make object visible false
+    elseif isNotYellow then
+      resetGame()
+    end
   end
-  if isTouchingBlue(ball) and isNotBlue then
-    resetGame()
+
+  if isTouchingBlue(ball) then 
+    if not isNotBlue then
+      -- counter 
+    elseif isNotBlue then
+      resetGame()
+    end
   end
+
   ball:drawTrail(canvas)
 
   if resetPopup:checkForMouseOverYes(mousePos) then
