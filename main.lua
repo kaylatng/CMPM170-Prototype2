@@ -16,7 +16,7 @@ function love.load()
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
   sti = require 'libraries/sti'
-  artMap = sti('background/simple.lua')
+  artMap = sti('background/easy.lua')
   throwSound = love.audio.newSource("sounds/throw.mp3", "static")
   throwSound:setVolume(0.1)
   wrongSound = love.audio.newSource("sounds/wrong.mp3", "static")
@@ -335,7 +335,7 @@ function love.mousepressed(x, y, button)
   if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverEasy(mousePos) then
     state = GAME_STATE.IN_PLAY
     settingButton.state = SETTING_STATE.IDLE
-    artMap = sti('background/simple.lua')
+    artMap = sti('background/easy.lua')
     switchSound:stop()
     switchSound:play()
   end
