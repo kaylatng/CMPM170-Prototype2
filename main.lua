@@ -50,7 +50,7 @@ function love.load()
   ball = Ball:new(40, 600, 0, 0, 15)
   resetPopup = Reset:new(centerX, centerY)
   settingButton = Setting:new(love.graphics.getWidth() - 60 + 10, love.graphics.getHeight() - 60 + 10)
-  state = GAME_STATE.SETTINGS -- IN_PLAY
+  state = GAME_STATE.IN_PLAY
   
   isDragging = false
   dragStartX = 0
@@ -121,6 +121,10 @@ function love.draw()
       love.graphics.rectangle("line", x, colorBoxY, colorBoxSize, colorBoxSize, 5, 5)
     end
   end
+
+  love.graphics.setColor(0, 0, 0, 1)
+  love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
+  love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
   
   if state == GAME_STATE.TRY_AGAIN then
     love.graphics.setColor(1, 1, 1, 0.4)
@@ -153,10 +157,6 @@ function love.draw()
     love.graphics.setColor(0, 0, 0, 1)
     -- love.graphics.print("Power: " .. math.floor(power), 10, 10)
   end
-  
-  love.graphics.setColor(0, 0, 0, 1)
-  love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
-  love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
 end
 
 local colorLayers = {
@@ -239,6 +239,16 @@ function love.update(dt)
     resetPopup.state = RESET_STATE.IDLE
   end
 
+  if settingButton:checkForMouseOverEasy(mousePos) then
+    settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_EASY
+  elseif settingButton:checkForMouseOverHard(mousePos) then
+    settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_HARD
+  elseif settingButton:checkForMouseOverExit(mousePos) then 
+    settingButton.screen_state = SETTING_SCREEN_STATE.HOVER_EXIT
+  else
+    settingButton.screen_state = SETTING_SCREEN_STATE.IDLE
+  end
+
   if state == GAME_STATE.IN_PLAY and settingButton:checkForMouseOver(mousePos) then
     settingButton.state = SETTING_STATE.HOVER
   else
@@ -259,6 +269,29 @@ function love.mousepressed(x, y, button)
   if state == GAME_STATE.IN_PLAY and settingButton:checkForMouseOver(mousePos) then
     state = GAME_STATE.SETTINGS
     settingButton.state = SETTING_STATE.SETTINGS
+    switchSound:stop()
+    switchSound:play()
+  end
+
+  if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverExit(mousePos) then
+    state = GAME_STATE.IN_PLAY
+    settingButton.state = SETTING_STATE.IDLE
+    switchSound:stop()
+    switchSound:play()
+  end
+
+  if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverEasy(mousePos) then
+    state = GAME_STATE.IN_PLAY
+    settingButton.state = SETTING_STATE.IDLE
+    artMap = sti('background/simple.lua')
+    switchSound:stop()
+    switchSound:play()
+  end
+
+  if state == GAME_STATE.SETTINGS and settingButton:checkForMouseOverHard(mousePos) then
+    state = GAME_STATE.IN_PLAY
+    settingButton.state = SETTING_STATE.IDLE
+    artMap = sti('background/backgroundMap.lua')
     switchSound:stop()
     switchSound:play()
   end

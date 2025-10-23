@@ -9,8 +9,15 @@ SETTING_STATE = {
 }
 
 SETTING_SCREEN_STATE = {
-
+  IDLE = 0,
+  HOVER_EASY = 1,
+  HOVER_HARD = 2,
+  HOVER_EXIT = 3,
 }
+
+local positionEASY = Vector(340, 260) 
+local positionHARD = Vector(330, 320)
+local positionEXIT = Vector(500, 133)
 
 local settingImage = nil
 local settingScreen = nil
@@ -23,7 +30,7 @@ function Setting:new(xPos, yPos)
   setting.position = Vector(xPos, yPos)
   setting.size = Vector(40, 40)
   setting.state = SETTING_STATE.IDLE
-  setting.screen_state = SETTING_SCREEN_STATE
+  setting.screen_state = SETTING_SCREEN_STATE.IDLE
 
   return setting
 end
@@ -48,21 +55,40 @@ end
 
 function Setting:draw()
   if self.state == SETTING_STATE.SETTINGS then 
-    settingFont = love.graphics.newFont(50)
-    normalFont = love.graphics.newFont(10)
-    love.graphics.setFont(settingFont)
-
-    -- if(self.screen_state == RESET_STATE.HOVER_YES) then
-    --   love.graphics.setColor(1, 0.2, 0.2, 1)
-    -- else
-    --   love.graphics.setColor(0, 0, 0, 1)
-    -- end
-    -- love.graphics.print("YES", self.positionYES.x, self.positionYES.y)
 
     screen = self:loadScreen()
     quadScreen = love.graphics.newQuad(0, 0, 281, 314, screen:getDimensions())
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(screen, quadScreen, love.graphics.getWidth()/2 - 140, 140)
+    love.graphics.draw(screen, quadScreen, love.graphics.getWidth()/2 - 140, 110)
+
+    settingFont = love.graphics.newFont(50)
+    exitFont = love.graphics.newFont(20)
+    normalFont = love.graphics.newFont(10)
+    love.graphics.setFont(settingFont)
+
+    if(self.screen_state == SETTING_SCREEN_STATE.HOVER_EASY) then
+      love.graphics.setColor(1, 0.2, 0.2, 1)
+    else
+      love.graphics.setColor(0, 0, 0, 1)
+    end
+    love.graphics.print("EASY", positionEASY.x, positionEASY.y)
+
+    if(self.screen_state == SETTING_SCREEN_STATE.HOVER_HARD) then
+      love.graphics.setColor(1, 0.2, 0.2, 1)
+    else
+      love.graphics.setColor(0, 0, 0, 1)
+    end
+    love.graphics.print("HARD", positionHARD.x, positionHARD.y)
+
+    love.graphics.setFont(exitFont)
+    if(self.screen_state == SETTING_SCREEN_STATE.HOVER_EXIT) then
+      love.graphics.setColor(1, 0.2, 0.2, 1)
+    else
+      love.graphics.setColor(0, 0, 0, 1)
+    end
+    love.graphics.print("×", positionEXIT.x, positionEXIT.y)
+
+    love.graphics.setFont(normalFont)
   else
     spritesheet = self:loadImage()
     quad = love.graphics.newQuad(0, 0, self.size.x, self.size.y, spritesheet:getDimensions())
@@ -89,6 +115,27 @@ function Setting:checkForMouseOver(mousePos)
         mousePos.x < self.position.x + self.size.x and
         mousePos.y > self.position.y and
         mousePos.y < self.position.y + self.size.y
+end
+
+function Setting:checkForMouseOverEasy(mousePos)
+  return mousePos.x > positionEASY.x and
+        mousePos.x < positionEASY.x + 120 and
+        mousePos.y > positionEASY.y and
+        mousePos.y < positionEASY.y + 50
+end
+
+function Setting:checkForMouseOverHard(mousePos)
+  return mousePos.x > positionHARD.x and
+        mousePos.x < positionHARD.x + 135 and
+        mousePos.y > positionHARD.y and
+        mousePos.y < positionHARD.y + 50
+end
+
+function Setting:checkForMouseOverExit(mousePos)
+  return mousePos.x > positionEXIT.x and
+        mousePos.x < positionEXIT.x + 135 and
+        mousePos.y > positionEXIT.y and
+        mousePos.y < positionEXIT.y + 50
 end
 
 function Setting:mousePressed()
