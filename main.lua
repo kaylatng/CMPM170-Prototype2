@@ -285,9 +285,11 @@ function love.update(dt)
     end
   end
 
-  -- Check if all objects are now invisible
-  if (counterTrue == 0 and ball.state == BALL_STATE.MAIN) then
-    gamewon()
+   -- Check if all objects are now invisible
+  if objectLayer then
+    if (counterTrue == 0) then
+      gamewon()
+    end
   end
   
 
