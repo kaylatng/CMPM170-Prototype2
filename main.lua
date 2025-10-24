@@ -12,6 +12,7 @@ GAME_STATE = {
   JOY = 4,
 }
 
+local backgroundMusic
 wrongSound = nil
 bounceSound = nil
 twinkleSound = nil
@@ -38,6 +39,16 @@ function love.load()
   twinkleSound:setVolume(0.5)
   sadhorn = love.audio.newSource("sounds/sad_horn.wav", "static")
   sadhorn:setVolume(0.5)
+
+  backgroundMusic = love.audio.newSource("sounds/background.mp3", "stream")
+  backgroundMusic:setLooping(true)
+  backgroundMusic:setVolume(0.1)
+  backgroundMusic:play()
+
+  bgmJoy = love.audio.newSource("sounds/peaceful.wav", "stream")
+  bgmJoy:setLooping(true)
+  bgmJoy:setVolume(0.1)
+
 
   targetZones = {}
   -- load object layer 
@@ -393,6 +404,8 @@ function love.mousepressed(x, y, button)
     settingButton.state = SETTING_STATE.IDLE
     ball.state = BALL_STATE.JOY
     artMap = sti('background/whitebackground.lua')
+    bgmJoy:play()
+    backgroundMusic:stop()
     switchSound:stop()
     switchSound:play()
   end
