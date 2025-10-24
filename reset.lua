@@ -86,7 +86,7 @@ end
 
 function Reset:draw()
   resetFont = love.graphics.newFont(50)
-  normalFont = love.graphics.newFont(10)
+  normalFont = love.graphics.newFont(20)
   love.graphics.setFont(resetFont)
   love.graphics.setColor(1, 1, 1, 1)
 
@@ -109,7 +109,7 @@ function Reset:draw()
   love.graphics.print("NO", self.positionNO.x, self.positionNO.y)
   love.graphics.setFont(normalFont)
   love.graphics.setColor(0, 0, 0, 1)
-  local width = 300  -- arbitrary area width to center within
+  local width = 500  -- arbitrary area width to center within
   love.graphics.printf(currentMessage, self.position.x - width / 2, self.position.y + 150, width, "center")
 end
 

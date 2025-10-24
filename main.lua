@@ -16,8 +16,12 @@ wrongSound = nil
 bounceSound = nil
 twinkleSound = nil
 sadhorn = nil
+bgm = nil
 
 function love.load()
+  normalFont = love.graphics.newFont(20)
+  love.graphics.setFont(normalFont)
+
   love.window.setTitle("prototype 2")
   love.window.setMode(800, 600)
   sti = require 'libraries/sti'
@@ -142,7 +146,7 @@ function love.draw()
 
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
-  love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
+  -- love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
   
   if state == GAME_STATE.TRY_AGAIN then
     love.graphics.setColor(1, 1, 1, 0.4)
