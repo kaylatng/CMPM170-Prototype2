@@ -64,7 +64,7 @@ function Setting:draw()
 
     settingFont = love.graphics.newFont(50)
     exitFont = love.graphics.newFont(20)
-    normalFont = love.graphics.newFont(10)
+    normalFont = love.graphics.newFont(20)
     love.graphics.setFont(settingFont)
 
     if(self.screen_state == SETTING_SCREEN_STATE.HOVER_EASY) then

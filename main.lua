@@ -18,9 +18,9 @@ bounceSound = nil
 twinkleSound = nil
 sadhorn = nil
 bgm = nil
+normalFont = love.graphics.newFont(20)
 
 function love.load()
-  normalFont = love.graphics.newFont(20)
   love.graphics.setFont(normalFont)
 
   love.window.setTitle("prototype 2")
@@ -121,6 +121,8 @@ function love.draw()
     end
   end
 
+  love.graphics.setFont(normalFont)
+
   love.graphics.setColor(1, 0, 0)
   love.graphics.print("\nVisible zones: " .. counterTrue, 10, 10)
 
@@ -155,6 +157,7 @@ function love.draw()
     end
   end
 
+  love.graphics.setFont(normalFont)
   love.graphics.setColor(0, 0, 0, 1)
   love.graphics.print("click ball and drag to fling | click colors to change ball color | press C to clear", 10, 10)
   -- love.graphics.print("Mouse: " .. tostring(mousePos.x) .. ", " .. tostring(mousePos.y))
