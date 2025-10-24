@@ -12,6 +12,7 @@ GAME_STATE = {
   JOY = 4,
 }
 
+local backgroundMusic
 wrongSound = nil
 bounceSound = nil
 twinkleSound = nil
@@ -34,6 +35,10 @@ function love.load()
   twinkleSound:setVolume(0.5)
   sadhorn = love.audio.newSource("sounds/sad_horn.wav", "static")
   sadhorn:setVolume(0.5)
+  backgroundMusic = love.audio.newSource("sounds/background.mp3", "stream")
+    backgroundMusic:setLooping(true)
+    backgroundMusic:setVolume(0.5)
+    backgroundMusic:play()
 
   targetZones = {}
   -- load object layer 
